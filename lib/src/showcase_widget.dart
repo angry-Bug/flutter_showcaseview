@@ -25,6 +25,7 @@ import 'package:flutter/material.dart';
 class ShowCaseWidget extends StatefulWidget {
   final Builder builder;
   final VoidCallback? onFinish;
+  final VoidCallback? onSkip;
   final Function(int?, GlobalKey)? onStart;
   final Function(int?, GlobalKey)? onComplete;
   final bool autoPlay;
@@ -35,6 +36,7 @@ class ShowCaseWidget extends StatefulWidget {
     required this.builder,
     this.onFinish,
     this.onStart,
+    this.onSkip,
     this.onComplete,
     this.autoPlay = false,
     this.autoPlayDelay = const Duration(milliseconds: 2000),
@@ -42,6 +44,10 @@ class ShowCaseWidget extends StatefulWidget {
   });
 
   static GlobalKey? activeTargetWidget(BuildContext context) {
+    if(context == null || context
+        .dependOnInheritedWidgetOfExactType<_InheritedShowCaseView>() == null)
+      return null;
+
     return context
         .dependOnInheritedWidgetOfExactType<_InheritedShowCaseView>()!
         .activeWidgetIds;
@@ -102,6 +108,11 @@ class ShowCaseWidgetState extends State<ShowCaseWidget> {
 
   void dismiss() {
     setState(_cleanupAfterSteps);
+    if (widget.onFinish != null) widget.onFinish!();
+  }
+
+  void skip(){
+    if (widget.onSkip != null) widget.onSkip!();
   }
 
   void _onStart() {

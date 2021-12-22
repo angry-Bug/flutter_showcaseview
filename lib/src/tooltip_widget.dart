@@ -45,6 +45,12 @@ class ToolTipWidget extends StatefulWidget {
   static late bool isArrowUp;
   final VoidCallback? onTooltipTap;
   final EdgeInsets? contentPadding;
+  final bool? showNextButton;
+  final bool? showSkipButton;
+  final String? nextButtonText;
+  final String? skipButtonText;
+  final VoidCallback? onNextButtonTap;
+  final VoidCallback? onSkipButtonTap;
 
   ToolTipWidget(
       {this.position,
@@ -62,7 +68,13 @@ class ToolTipWidget extends StatefulWidget {
       this.contentHeight,
       this.contentWidth,
       this.onTooltipTap,
-      this.contentPadding = const EdgeInsets.symmetric(vertical: 8)});
+      this.contentPadding = const EdgeInsets.symmetric(vertical: 8),
+        this.showNextButton,
+        this.showSkipButton,
+        this.nextButtonText,
+        this.skipButtonText,
+        this.onNextButtonTap,
+        this.onSkipButtonTap,});
 
   @override
   _ToolTipWidgetState createState() => _ToolTipWidgetState();
@@ -74,7 +86,10 @@ class _ToolTipWidgetState extends State<ToolTipWidget> {
   bool isCloseToTopOrBottom(Offset position) {
     var height = 120.0;
     height = widget.contentHeight ?? height;
-    return (widget.screenSize!.height - position.dy) <= height;
+    var bottomPosition = position.dy + (widget.position!.getHeight() / 2);
+    var topPosition = position.dy - (widget.position!.getHeight() / 2);
+    return (widget.screenSize!.height - bottomPosition) <= height &&
+        topPosition >= height;
   }
 
   String findPositionForContent(Offset position) {
@@ -98,11 +113,11 @@ class _ToolTipWidgetState extends State<ToolTipWidget> {
             .merge(TextStyle(color: widget.textColor));
     final titleLength = widget.title == null
         ? 0
-        : _textSize(widget.title!, titleStyle).width +
+        : _textSize(widget.title ?? '', titleStyle).width +
             widget.contentPadding!.right +
             widget.contentPadding!.left;
     final descriptionLength =
-        _textSize(widget.description!, descriptionStyle).width +
+        _textSize(widget.description ?? '', descriptionStyle).width +
             widget.contentPadding!.right +
             widget.contentPadding!.left;
     var maxTextWidth = max(titleLength, descriptionLength);
@@ -215,6 +230,7 @@ class _ToolTipWidgetState extends State<ToolTipWidget> {
                   top: paddingTop - (ToolTipWidget.isArrowUp ? arrowHeight : 0),
                   bottom: paddingBottom -
                       (ToolTipWidget.isArrowUp ? 0 : arrowHeight),
+                  left: 4,
                 ),
                 child: Stack(
                   alignment: ToolTipWidget.isArrowUp
@@ -292,9 +308,15 @@ class _ToolTipWidgetState extends State<ToolTipWidget> {
                                               .merge(
                                                 TextStyle(
                                                   color: widget.textColor,
+                                                  fontSize: 16
                                                 ),
                                               ),
                                     ),
+                                    if ((widget.showNextButton ?? false) ||
+                                        (widget.showSkipButton ?? false)) ...[
+                                      const SizedBox(height: 8.0),
+                                      _buildBottomButtons(context),
+                                    ]
                                   ],
                                 )
                               ],
@@ -366,6 +388,44 @@ class _ToolTipWidgetState extends State<ToolTipWidget> {
           ..layout())
         .size;
     return textPainter;
+  }
+
+  Widget _buildBottomButtons(BuildContext context) {
+    return Row(
+      children: [
+        if (widget.showSkipButton ?? false)
+          InkWell(
+            onTap: widget.onSkipButtonTap,
+            child: Padding(
+              padding: const EdgeInsets.all(4.0),
+              child: Text(
+                widget.skipButtonText ?? "Skip",
+                style: widget.descTextStyle ??
+                    Theme.of(context)
+                        .textTheme
+                        .subtitle2!
+                        .merge(TextStyle(color: Colors.red.shade300, fontSize: 12)),
+              ),
+            ),
+          ),
+        const Spacer(),
+        if (widget.showNextButton ?? false)
+          InkWell(
+            onTap: widget.onNextButtonTap,
+            child: Padding(
+              padding: const EdgeInsets.all(4.0),
+              child: Text(
+                widget.nextButtonText ?? "Next",
+                style: widget.descTextStyle ??
+                    Theme.of(context)
+                        .textTheme
+                        .subtitle2!
+                        .merge(TextStyle(color: Colors.blueAccent, fontSize: 12)),
+              ),
+            ),
+          ),
+      ],
+    );
   }
 }
 
