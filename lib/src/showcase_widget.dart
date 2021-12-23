@@ -20,11 +20,7 @@
  * SOFTWARE.
  */
 
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
-
-import '../showcaseview.dart';
 
 class ShowCaseWidget extends StatefulWidget {
   final Builder builder;
@@ -36,12 +32,6 @@ class ShowCaseWidget extends StatefulWidget {
   final Duration autoPlayDelay;
   final bool autoPlayLockEnable;
 
-  /// Default overlay blur used by showcase. if [Showcase.blurValue]
-  /// is not provided.
-  ///
-  /// Default value is 0.
-  final double blurValue;
-
   const ShowCaseWidget({
     required this.builder,
     this.onFinish,
@@ -51,7 +41,6 @@ class ShowCaseWidget extends StatefulWidget {
     this.autoPlay = false,
     this.autoPlayDelay = const Duration(milliseconds: 2000),
     this.autoPlayLockEnable = false,
-    this.blurValue = 0,
   });
 
   static GlobalKey? activeTargetWidget(BuildContext context) {
@@ -60,8 +49,8 @@ class ShowCaseWidget extends StatefulWidget {
       return null;
 
     return context
-        .dependOnInheritedWidgetOfExactType<_InheritedShowCaseView>()
-        ?.activeWidgetIds;
+        .dependOnInheritedWidgetOfExactType<_InheritedShowCaseView>()!
+        .activeWidgetIds;
   }
 
   static ShowCaseWidgetState? of(BuildContext context) {
@@ -84,9 +73,6 @@ class ShowCaseWidgetState extends State<ShowCaseWidget> {
   late Duration autoPlayDelay;
   late bool autoPlayLockEnable;
 
-  /// Returns value of  [ShowCaseWidget.blurValue]
-  double get blurValue => widget.blurValue;
-
   @override
   void initState() {
     super.initState();
@@ -96,17 +82,15 @@ class ShowCaseWidgetState extends State<ShowCaseWidget> {
   }
 
   void startShowCase(List<GlobalKey> widgetIds) {
-    if (mounted) {
-      setState(() {
-        ids = widgetIds;
-        activeWidgetId = 0;
-        _onStart();
-      });
-    }
+    setState(() {
+      ids = widgetIds;
+      activeWidgetId = 0;
+      _onStart();
+    });
   }
 
   void completed(GlobalKey? id) {
-    if (ids != null && ids![activeWidgetId!] == id && mounted) {
+    if (ids != null && ids![activeWidgetId!] == id) {
       setState(() {
         _onComplete();
         activeWidgetId = activeWidgetId! + 1;
@@ -123,10 +107,8 @@ class ShowCaseWidgetState extends State<ShowCaseWidget> {
   }
 
   void dismiss() {
-    if(mounted) {
-      setState(_cleanupAfterSteps);
-      if (widget.onFinish != null) widget.onFinish!();
-    }
+    setState(_cleanupAfterSteps);
+    if (widget.onFinish != null) widget.onFinish!();
   }
 
   void skip(){

@@ -29,7 +29,6 @@ class MyApp extends StatelessWidget {
                       statusBarIconBrightness: Brightness.dark,
                       statusBarColor: Colors.white));
           },
-          blurValue: 1,
           builder: Builder(builder: (context) => MailPage()),
           autoPlay: false,
           autoPlayDelay: Duration(seconds: 3),
@@ -162,6 +161,8 @@ class _MailPageState extends State<MailPage> {
                                     Showcase(
                                       key: _one,
                                       description: 'Tap to see menu options',
+                                      showNextButton: true,
+                                      showSkipButton: true,
                                       child: Icon(
                                         Icons.menu,
                                         color: Theme.of(context).primaryColor,
@@ -310,7 +311,7 @@ class _MailPageState extends State<MailPage> {
                         height: 50,
                         width: 140,
                         shapeBorder: CircleBorder(),
-                        radius: BorderRadius.all(Radius.circular(150)),
+                        //radius: BorderRadius.all(Radius.circular(150)),
                         container: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: <Widget>[
